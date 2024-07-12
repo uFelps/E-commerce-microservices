@@ -1,0 +1,26 @@
+services:
+  pedido-db:
+    image: postgres
+    container_name: pedido-db
+    environment:
+      POSTGRES_DB: pedidos
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin1234
+
+    ports:
+      - '5433:5432'
+
+  rabbitmq:
+      image: rabbitmq:3.10-management
+      restart: always
+      ports:
+        - '5672:5672'
+        - '15672:15672'
+      environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+      healthcheck:
+        test: rabbitmq-diagnostics -q ping
+        timeout: 5s
+        interval: 5s
+        retries: 3
