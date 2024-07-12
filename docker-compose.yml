@@ -1,9 +1,9 @@
 services:
-  pedido-db:
+  order-db:
     image: postgres
-    container_name: pedido-db
+    container_name: order-db
     environment:
-      POSTGRES_DB: pedidos
+      POSTGRES_DB: orders
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin1234
 

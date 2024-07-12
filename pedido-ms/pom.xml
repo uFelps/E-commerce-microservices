@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.services</groupId>
-	<artifactId>pedido-ms</artifactId>
+	<artifactId>order-ms</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>pedido-ms</name>
+	<name>order-ms</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

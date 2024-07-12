@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.services</groupId>
-	<artifactId>notificacao-ms</artifactId>
+	<artifactId>notification-ms</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>notificacao-ms</name>
+	<name>notification-ms</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
