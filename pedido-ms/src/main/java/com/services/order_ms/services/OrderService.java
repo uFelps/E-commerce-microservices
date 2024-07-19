@@ -3,7 +3,7 @@ package com.services.order_ms.services;
 import com.services.order_ms.dtos.ItemDTO;
 import com.services.order_ms.dtos.OrderDTO;
 import com.services.order_ms.dtos.OrderItemDTO;
-import com.services.order_ms.dtos.OrderNotificationDTO;
+import com.services.order_ms.dtos.OrderMessageDTO;
 import com.services.order_ms.entities.Item;
 import com.services.order_ms.entities.Order;
 import com.services.order_ms.entities.OrderItem;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -70,7 +71,7 @@ public class OrderService {
         OrderDTO newPedido = new OrderDTO(order.getId(), order.getCreatedOn(), order.getTotal(), order.getStatus(), order.getUsuario().getId(), items);
 
         rabbitTemplate.convertAndSend("ex.orders-created", "",
-                new OrderNotificationDTO(
+                new OrderMessageDTO(
                         order.getId(),
                         order.getTotal(),
                         dto.customerId(),
@@ -100,5 +101,20 @@ public class OrderService {
                 order.getUsuario().getId(),
                 itens
         );
+    }
+
+    public void confirmOrder(Long id) {
+
+        try {
+            Order order = repository.findById(id).orElseThrow(() -> new DataNotFoundException("Order not found! ID: " + id));
+
+            order.setStatus(OrderStatus.CONFIRMED);
+            repository.save(order);
+
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage())
+            ;
+        }
+
     }
 }

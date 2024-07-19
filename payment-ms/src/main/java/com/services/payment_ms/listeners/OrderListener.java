@@ -1,7 +1,8 @@
-package com.services.notification_ms.listeners;
+package com.services.payment_ms.listeners;
 
-import com.services.notification_ms.dtos.OrderMessageDTO;
-import com.services.notification_ms.services.NotificationService;
+import com.services.payment_ms.dto.OrderMessageDTO;
+import com.services.payment_ms.services.PaymentService;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,11 +12,10 @@ import org.springframework.stereotype.Component;
 public class OrderListener {
 
     @Autowired
-    private NotificationService service;
+    private PaymentService service;
 
-    @RabbitListener(queues = "notification.order")
-    public void receiveNewOrder(@Payload OrderMessageDTO notification) {
-
+    @RabbitListener(queues = "payment.pending")
+    public void receiveNewPayment(@Payload OrderMessageDTO notification){
         String message = """
                 Order Id: %s
                 Total: %s
@@ -28,7 +28,6 @@ public class OrderListener {
                 notification.email(),
                 notification.message());
         System.out.println("Receive the message: \n" + message);
-        service.sendNotification(notification);
-
+        service.createNewPayment(notification);
     }
 }

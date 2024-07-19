@@ -1,4 +1,4 @@
-package com.services.order_ms.amqp;
+package com.services.payment_ms.amqp;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -14,26 +14,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OrderAMQPConfiguration {
+public class PaymentAMQPConfiguration {
 
     @Bean
-    public FanoutExchange fanoutExchange() {
+    public Queue paymentPendingQueue() {
+        return new Queue("payment.pending");
+    }
+
+    @Bean
+    public FanoutExchange ordersCreatedExchange() {
         return new FanoutExchange("ex.orders-created");
     }
 
     @Bean
-    public FanoutExchange ordersPaidExchange() {
+    public FanoutExchange ordersPaidExchange(){
         return new FanoutExchange("ex.orders-paid");
     }
 
     @Bean
-    public Queue ordersPaidQueue() {
-        return new Queue("orders.paid");
-    }
-
-    @Bean
-    public Binding bindingOrdersPaid() {
-        return BindingBuilder.bind(ordersPaidQueue()).to(ordersPaidExchange());
+    public Binding bindingOrderPayment() {
+        return BindingBuilder.bind(paymentPendingQueue()).to(ordersCreatedExchange());
     }
 
     @Bean
@@ -57,6 +57,4 @@ public class OrderAMQPConfiguration {
         rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter);
         return rabbitTemplate;
     }
-
-
 }
