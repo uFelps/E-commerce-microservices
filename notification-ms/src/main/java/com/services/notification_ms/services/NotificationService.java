@@ -1,5 +1,6 @@
 package com.services.notification_ms.services;
 
+import com.services.notification_ms.dtos.MessageDTO;
 import com.services.notification_ms.dtos.OrderMessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,10 @@ public class NotificationService {
     private NotificationSenderService notificationSenderService;
 
 
-    public void sendNotification(OrderMessageDTO orderMessageDTO){
+    public void sendNotification(MessageDTO messageDTO){
         notificationSenderService.send(
-                orderMessageDTO.email(),
+                messageDTO.getTo(),
                 "Order Created",
-                orderMessageDTO.message());
+                messageDTO.getMessage());
     }
 }

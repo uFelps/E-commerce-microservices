@@ -18,7 +18,7 @@ public class NotificationAMQPConfiguration {
 
 
     @Bean
-    public Queue notificacaoPedido(){
+    public Queue notificationOrder(){
         return new Queue("notification.order");
     }
 
@@ -30,8 +30,24 @@ public class NotificationAMQPConfiguration {
     @Bean
     public Binding bindOrderNotification(FanoutExchange fanoutExchange){
         return BindingBuilder
-                .bind(notificacaoPedido())
+                .bind(notificationOrder())
                 .to(fanoutExchange());
+    }
+
+
+    @Bean
+    public Queue notificationPayment(){ return new Queue("notification.payment");}
+
+    @Bean
+    public FanoutExchange ordersPaidExchange(){
+        return new FanoutExchange("ex.orders-paid");
+    }
+
+    @Bean
+    public Binding bindOrdersPaid(){
+        return BindingBuilder
+                .bind(notificationPayment())
+                .to(ordersPaidExchange());
     }
 
     @Bean
