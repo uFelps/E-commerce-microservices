@@ -44,7 +44,8 @@ public class OrderService {
     @Transactional
     public OrderDTO createOrder(OrderDTO dto) {
 
-        Order order = new Order(null, LocalDateTime.now(), null, OrderStatus.CREATED, customerService.getCustomerReferenceById(dto.customerId()));
+        Order order = new Order(null, LocalDateTime.now(), null, OrderStatus.CREATED, null);
+        order.setUsuario(customerService.getCustomerById(dto.customerId()));
 
         order.setTotal(dto.items().stream()
                 .map(
@@ -112,8 +113,7 @@ public class OrderService {
             repository.save(order);
 
         } catch (DataNotFoundException e) {
-            System.out.println(e.getMessage())
-            ;
+            System.out.println(e.getMessage());
         }
 
     }

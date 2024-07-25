@@ -2,6 +2,7 @@ package com.services.order_ms.controllers;
 
 import com.services.order_ms.dtos.OrderDTO;
 import com.services.order_ms.services.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class OrderController {
 
 
     @PostMapping("/createOrder")
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO dto){
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody @Valid OrderDTO dto){
 
         OrderDTO newDto = service.createOrder(dto);
 

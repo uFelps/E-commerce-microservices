@@ -2,6 +2,7 @@ package com.services.order_ms.controllers;
 
 import com.services.order_ms.dtos.CustomerDTO;
 import com.services.order_ms.services.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class CustomerController {
 
 
     @PostMapping("/createCustomer")
-    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO dto){
+    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody @Valid CustomerDTO dto){
 
         CustomerDTO newCustomer = service.createCustomer(dto);
 

@@ -7,6 +7,8 @@ import com.services.order_ms.services.exceptions.DataNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
+
 @Service
 public class CustomerService {
 
@@ -29,5 +31,9 @@ public class CustomerService {
             throw new DataNotFoundException("Customer not found! ID: " + id);
         }
 
+    }
+
+    public Customer getCustomerById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new DataNotFoundException("Customer not found! ID: " + id));
     }
 }
