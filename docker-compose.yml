@@ -1,7 +1,7 @@
 services:
-  order-db:
+  orderdb:
     image: postgres
-    container_name: order-db
+    container_name: orderdb
     environment:
       POSTGRES_DB: orders
       POSTGRES_USER: admin
@@ -9,10 +9,16 @@ services:
 
     ports:
       - '5433:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
-  payment-db:
+  paymentdb:
     image: postgres
-    container_name: payment-db
+    container_name: paymentdb
     environment:
       POSTGRES_DB: payments
       POSTGRES_USER: admin
@@ -20,18 +26,108 @@ services:
 
     ports:
       - '5434:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
   rabbitmq:
-      image: rabbitmq:3.10-management
-      restart: always
-      ports:
-        - '5672:5672'
-        - '15672:15672'
-      environment:
-        RABBITMQ_DEFAULT_USER: guest
-        RABBITMQ_DEFAULT_PASS: guest
-      healthcheck:
-        test: rabbitmq-diagnostics -q ping
-        timeout: 5s
-        interval: 5s
-        retries: 3
+    image: rabbitmq:3.10-management
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+  eureka-server:
+    build: "./eureka-server"
+    container_name: eureka-server
+    ports:
+      - '8082:8082'
+
+    environment:
+      EUREKA_HOST: eureka-server
+
+    healthcheck:
+      test: "curl --fail --silent localhost:8082/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  gateway:
+    build: "./gateway"
+    container_name: gateway
+    ports:
+      - '8080:8080'
+    environment:
+      EUREKA_HOST: eureka-server
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  order-ms:
+    build: "./order-ms"
+    container_name: order-ms
+    depends_on:
+      orderdb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+    environment:
+      - DB_HOST=orderdb
+      - DB_PORT=5432
+      - INITIAL_DB=orders
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin1234
+      - EUREKA_HOST=eureka-server
+      - RABBIT_HOST=rabbitmq
+
+  payment-ms:
+    build: "./payment-ms"
+    container_name: payment-ms
+    depends_on:
+      paymentdb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+    environment:
+      - DB_HOST=paymentdb
+      - DB_PORT=5432
+      - INITIAL_DB=payments
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin1234
+      - EUREKA_HOST=eureka-server
+      - RABBIT_HOST=rabbitmq
+
+  notification-ms:
+    build: "./notification-ms"
+    container_name: notification-ms
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_HOST=eureka-server
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - AWS_ACCESSKEY=
+      - AWS_SECRETKEY=
+      - EMAIL_SOURCE=
